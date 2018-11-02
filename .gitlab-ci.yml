@@ -1,14 +1,27 @@
 stages:
+- runall
 - build
 - collate
 
-# Build
-build_osx:
-  stage: build
+# This is just a config to help trigger rest of the builds
+run_all_builds:
+  image: ubuntu:latest
+  stage: runall
+  variables:
+    GIT_STRATEGY: none
+  script:
+  - pwd
   when: manual
+  allow_failure: false
+
+# Build
+build_osx_runtime:
+  stage: build
   tags:
     - buildfarm
     - darwin
+  dependencies:
+  - run_all_builds
   script:
   - git submodule update --init --recursive
   - echo -e "[auth]\nono.schemes=https\nono.prefix=ono.unity3d.com\nono.username=$GITLAB_UNITY_META_ONO_USER\nono.password=$GITLAB_UNITY_META_ONO_PASS\n" >> ~/.hgrc
@@ -23,10 +36,11 @@ build_osx:
 
 build_osx_classlibs:
   stage: build
-  when: manual
   tags:
     - buildfarm
     - darwin
+  dependencies:
+  - run_all_builds
   script:
   - git submodule update --init --recursive
   - echo -e "[auth]\nono.schemes=https\nono.prefix=ono.unity3d.com\nono.username=$GITLAB_UNITY_META_ONO_USER\nono.password=$GITLAB_UNITY_META_ONO_PASS\n" >> ~/.hgrc
@@ -41,10 +55,11 @@ build_osx_classlibs:
 
 build_android:
   stage: build
-  when: manual
   tags:
     - buildfarm
     - darwin
+  dependencies:
+  - run_all_builds
   script:
   - git submodule update --init --recursive
   - echo -e "[auth]\nono.schemes=https\nono.prefix=ono.unity3d.com\nono.username=$GITLAB_UNITY_META_ONO_USER\nono.password=$GITLAB_UNITY_META_ONO_PASS\n" >> ~/.hgrc
@@ -59,10 +74,11 @@ build_android:
 
 build_win:
   stage: build
-  when: manual
   tags:
   - buildfarm
   - windows
+  dependencies:
+  - run_all_builds
   script:
   - git submodule update --init --recursive
   - perl external/buildscripts/build_runtime_win64.pl
@@ -76,10 +92,11 @@ build_win:
 
 build_win_x86:
   stage: build
-  when: manual
   tags:
   - buildfarm
   - windows
+  dependencies:
+  - run_all_builds
   script:
   - git submodule update --init --recursive
   - perl external/buildscripts/build_runtime_win.pl
@@ -93,10 +110,11 @@ build_win_x86:
 
 build_win_bare_minimum:
   stage: build
-  when: manual
   tags:
   - buildfarm
   - windows
+  dependencies:
+  - run_all_builds
   script:
   - git submodule update --init --recursive
   - perl external/buildscripts/build_unityscript_bareminimum_win.pl
@@ -110,10 +128,11 @@ build_win_bare_minimum:
 
 build_linux_x64:
   stage: build
-  when: manual
   tags:
     - buildfarm
     - linux
+  dependencies:
+  - run_all_builds
   script:
   - git submodule update --init --recursive
   - echo -e "[auth]\nono.schemes=https\nono.prefix=ono.unity3d.com\nono.username=$GITLAB_UNITY_META_ONO_USER\nono.password=$GITLAB_UNITY_META_ONO_PASS\n" >> ~/.hgrc
@@ -128,10 +147,11 @@ build_linux_x64:
 
 build_linux_x86:
   stage: build
-  when: manual
   tags:
     - buildfarm
     - linux
+  dependencies:
+  - run_all_builds
   script:
   - git submodule update --init --recursive
   - echo -e "[auth]\nono.schemes=https\nono.prefix=ono.unity3d.com\nono.username=$GITLAB_UNITY_META_ONO_USER\nono.password=$GITLAB_UNITY_META_ONO_PASS\n" >> ~/.hgrc
@@ -144,21 +164,18 @@ build_linux_x86:
   after_script:
     - /opt/post_build_script.sh
 
-
 collate_builds:
   image: ubuntu:latest
   stage: collate
-  when: manual
   dependencies:
-  - build_osx
+  - build_osx_runtime
   - build_osx_classlibs
   - build_win
   - build_win_x86
   - build_win_bare_minimum
-  # - build_linux_x86
-  # - build_linux_x64
+  - build_linux_x86
+  - build_linux_x64
   before_script:
   - apt-get update -qy && apt-get -qy upgrade
   script:
   - perl external/buildscripts/collect_allbuilds.pl
-
