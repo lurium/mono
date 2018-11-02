@@ -180,7 +180,7 @@ else
 # abs_path ends up returning an empty string
 $externalBuildDeps = abs_path($externalBuildDeps) if (-d $externalBuildDeps);
 
-my $extraBuildTools = "$monoroot/../../mono-build-tools-extra/build";
+my $extraBuildTools = "$monoroot/mono-build-tools-extra/build";
 
 my $existingExternalMonoRoot = "$externalBuildDeps/MonoBleedingEdge";
 my $existingExternalMono = "";

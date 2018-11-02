@@ -129,8 +129,8 @@ build_win_bare_minimum:
 build_linux_x64:
   stage: build
   tags:
-    - buildfarm
-    - linux
+  - buildfarm
+  - linux
   dependencies:
   - run_all_builds
   script:
@@ -148,8 +148,8 @@ build_linux_x64:
 build_linux_x86:
   stage: build
   tags:
-    - buildfarm
-    - linux
+  - buildfarm
+  - linux
   dependencies:
   - run_all_builds
   script:
@@ -173,8 +173,8 @@ collate_builds:
   - build_win
   - build_win_x86
   - build_win_bare_minimum
-  - build_linux_x86
-  - build_linux_x64
+  #- build_linux_x86
+  #- build_linux_x64
   before_script:
   - apt-get update -qy && apt-get -qy upgrade
   script:
