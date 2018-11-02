@@ -166,7 +166,7 @@ build_linux_x86:
     
 build_linux_x86_bokken:
   stage: build
-  image: 'slough-ops/ubuntu-18.04:stable'
+  image: 'cds-ops/ubuntu-18.04-agent'
   when: manual
   tags:
   - bokken-runner
