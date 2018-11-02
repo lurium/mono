@@ -163,6 +163,24 @@ build_linux_x86:
 # Important! Do not remove this after_script!!  
   after_script:
     - /opt/post_build_script.sh
+    
+build_linux_x86_bokken:
+  stage: build
+  image: 'slough-ops/ubuntu-18.04:stable'
+  when: manual
+  tags:
+  - bokken-runner
+  script:
+  - git submodule update --init --recursive
+  - echo -e "[auth]\nono.schemes=https\nono.prefix=ono.unity3d.com\nono.username=$GITLAB_UNITY_META_ONO_USER\nono.password=$GITLAB_UNITY_META_ONO_PASS\n" >> ~/.hgrc
+  - perl external/buildscripts/build_runtime_linux.pl
+  artifacts:
+    paths:
+    - builds
+    expire_in: 1 week
+# Important! Do not remove this after_script!!  
+  after_script:
+    - /opt/post_build_script.sh
 
 collate_builds:
   image: ubuntu:latest
